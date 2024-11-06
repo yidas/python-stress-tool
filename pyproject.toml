@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "stress_tool"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="Nick Tsai", email="myintaer@gmail.com" },
 ]
@@ -17,7 +17,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "worker-dispatcher>=1.0.6",
+    "worker-dispatcher>=1.0.7",
     "openpyxl>=3.0.0",
 ]
 

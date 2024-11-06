@@ -21,6 +21,8 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
     # TPS calculation
     tps_data = worker_dispatcher.get_tps(interval=1, display_intervals=True)
     wd_config = worker_dispatcher.get_last_config()
+    if not wd_config.get('worker'):
+        return False
 
     # Create a new Workbook
     workbook = openpyxl.Workbook()
@@ -39,9 +41,9 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
     rows_data.append(["Total Duration", "{:.6f} sec".format(tps_data['duration'])])
     rows_data.append(["Number of Requests", tps_data['count']['total']])
     if wd_config['worker'].get('per_second'):
-        rows_data.append(["Concurrency per second", int(wd_config['worker']['number'] / wd_config['worker']['per_second'])])
+        rows_data.append(["Concurrency per second", int(wd_config['worker'].get('number') / wd_config['worker'].get('per_second'))])
     else:
-        rows_data.append(["Concurrency", wd_config['worker']['number']])
+        rows_data.append(["Concurrency", wd_config['worker'].get('number')])
     rows_data.append(["Number of Successes", tps_data['count']['success']])
     rows_data.append(["Success Rate", "{:.2f}%".format(tps_data['count']['success'] / tps_data['count']['total'] * 100 if tps_data['count']['total'] > 0 else 0)])
     rows_data.append(["Metrices:"])
@@ -78,7 +80,7 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
     # Sheet for Raw Logs
     sheet = workbook.create_sheet(title="Raw Logs")
     # header
-    header_row = ["Task ID", "Started at", "Ended at", "Duration (sec)"]
+    header_row = ["Task ID", "Started at", "Ended at", "Duration (sec)", "Success"]
     # Customized Fields
     customized_fields = config['raw_logs']['fields']
     for key, value in customized_fields.items():
@@ -87,7 +89,7 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
 
     # Each row
     for log in worker_dispatcher.get_logs():
-        row_data = [log['task_id'], str(log['started_at']), str(log['ended_at']), log['ended_at'] - log['started_at']]
+        row_data = [log['task_id'], str(log['started_at']), str(log['ended_at']), log['ended_at'] - log['started_at'], worker_dispatcher.result_is_success(log['result'])]
         # Customized Fields
         user_log = log.get('log', {})
         for key, value in customized_fields.items():
