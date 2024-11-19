@@ -8,7 +8,7 @@
 
 Stress test tool with statistical TPS reports based on Worker Dispatcher in Python
 
-[![PyPI](https://img.shields.io/pypi/v/worker-dispatcher)](https://pypi.org/project/stress-tool/)
+[![PyPI](https://img.shields.io/pypi/v/stress-tool)](https://pypi.org/project/stress-tool/)
 ![](https://img.shields.io/pypi/implementation/stress-tool)
 
 
@@ -16,7 +16,7 @@ Stress test tool with statistical TPS reports based on Worker Dispatcher in Pyth
 Features
 --------
 
-- Based on ***Worker Dispatcher** to managed workers*
+- Based on ***[Worker Dispatcher](https://github.com/yidas/python-worker-dispatcher)** to managed workers*
 
 - ***Statistical TPS Report** in Excel sheets*
 
@@ -31,6 +31,8 @@ OUTLINE
 - [Demonstration](#demonstration)
 - [Introduction](#introduction)
 - [Installation](#installation)
+- [Usage](#usage)
+    - [generate_report()](#generate_report)
 
 ---
 
@@ -47,7 +49,6 @@ def each_task(id: int, config, task, log):
     return response
 
 def main():
-
     results = stress_test.start({
         'task': {
             'list': ['ORD_AH001', 'ORD_KL502', '...' , 'ORD_GR393'],
@@ -57,9 +58,8 @@ def main():
             },
         }
     })
-
+    # Generate the TPS report if the stress test completes successfully.
     if results != False:
-
         file_path = stress_test.generate_report(file_path='./tps-report.xlsx')
         print("Report has been successfully generated at {}".format(file_path))
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     main()
 ```
 
-<img src="https://github.com/yidas/python-stress-tool/blob/main/img/demonstration_excel.png?raw=true" width="400px" />
+<img src="https://github.com/yidas/python-stress-tool/blob/main/img/demonstration_excel.png?raw=true" />
 
 ---
 
@@ -116,8 +116,48 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
 
 |Option            |Type     |Deafult      |Description|
 |:--               |:--      |:--          |:--        |
-|raw_logs.fields   |dict     |None         |Customized field setting for the `Raw Logs` sheet. <BR>Key is field name, the value can be two types:<BR> - String: Grab from the key name of the log from Worker Dispacther. <BR> - lambda function: |
+|raw_logs.fields   |dict     |None         |Customized field setting for the `Raw Logs` sheet. <BR>Key is field name, the value can be two types:<BR> - String: Use the provided value as the log key name from Worker Dispatcher to retrieve the value. <BR> - lambda function: Retrieve the return value from the lambda function.|
 
+#### Sample config
+
+```python
+import stress_tool
+import requests
+
+# task.callback function
+def task(id: int, config, task, log):
+    try:
+        response = log['response'] = requests.get('https://your.name/path/')
+        try:
+            api_return_code = log['api_return_code'] = response.json().get('returnCode')
+            return True if api_return_code == "0000" else False
+        except Exception as e:
+            return False
+    except requests.exceptions.ConnectionError:
+        log['error'] = 'ConnectionError'
+    return False
+
+# Start stress test
+results = stress_tool.start({
+    # 'debug': True,
+    'task': {
+        'list': 60,
+        'callback': task,
+    },
+})
+
+# Generate the report
+file_path = stress_test.generate_report(config={
+    'raw_logs': {
+        'fields': {
+            'Customized Field - HTTP code': lambda log: log.get('response').status_code,
+            'Customized Field - API Return code': 'api_return_code',
+            'Customized Field - Response Body': lambda log: log.get('response').text,
+        }
+    },
+})
+
+```
 
 
 

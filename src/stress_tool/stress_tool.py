@@ -12,14 +12,20 @@ def start(config: dict, worker_dispatcher: object=None):
     worker_dispatcher = lib_worker_dispatcher if worker_dispatcher is None else worker_dispatcher
     return worker_dispatcher.start(config)
 
-def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: str='./tps-report.xlsx'):
+def generate_report(
+        config: dict={}, 
+        worker_dispatcher: object=None, 
+        file_path: str='./tps-report.xlsx',
+        display_intervals: bool=True,
+        interval: float=1,
+        ):
 
     config =_merge_dicts_recursive(default_config, config)
 
     worker_dispatcher = lib_worker_dispatcher if worker_dispatcher is None else worker_dispatcher
 
     # TPS calculation
-    tps_data = worker_dispatcher.get_tps(interval=1, display_intervals=True)
+    tps_data = worker_dispatcher.get_tps(interval=interval, display_intervals=display_intervals)
     wd_config = worker_dispatcher.get_last_config()
     if not wd_config.get('worker'):
         return False
