@@ -109,7 +109,7 @@ By calling the `start()` method with the configuration parameters, the package w
 An example configuration setting with all options is as follows:
 
 ```python
-def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: str='./tps-report.xlsx'):
+def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: str='./tps-report.xlsx', display_intervals: bool=True, interval: float=1):
 ```
 
 #### config
@@ -159,8 +159,13 @@ file_path = stress_test.generate_report(config={
 
 ```
 
+#### display_intervals
 
+Indicates whether to generate `Intervals` sheet.
 
+#### interval
+
+Based on `Intervals` sheet, specifies the number of seconds for each split.
 
 
 
