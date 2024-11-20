@@ -45,17 +45,14 @@ Just write your own callback functions based on the [Worker Dispatcher](https://
 import stress_test
 
 def each_task(id: int, config, task, log):
-    response = requests.get(config['my_endpoint'] + task)
+    response = requests.get('https://your.name/reserve-api/')
     return response
 
 def main():
     results = stress_test.start({
         'task': {
-            'list': ['ORD_AH001', 'ORD_KL502', '...' , 'ORD_GR393'],
+            'list': 1000,
             'callback': each_task,
-            'config': {
-                'my_endpoint': 'https://your.name/order-handler/'
-            },
         }
     })
     # Generate the TPS report if the stress test completes successfully.
