@@ -17,18 +17,22 @@ def generate_report(
         worker_dispatcher: object=None, 
         file_path: str='./tps-report.xlsx',
         display_intervals: bool=True,
-        interval: float=1,
+        interval: float=0,
+        use_processing: bool = False,
+        verbose: bool = False,
+        debug: bool = False,
         ):
 
     config =_merge_dicts_recursive(default_config, config)
-
     worker_dispatcher = lib_worker_dispatcher if worker_dispatcher is None else worker_dispatcher
 
-    # TPS calculation
-    tps_data = worker_dispatcher.get_tps(interval=interval, display_intervals=display_intervals)
+    # Check the last config
     wd_config = worker_dispatcher.get_last_config()
     if not wd_config.get('worker'):
         return False
+    
+    # TPS calculation
+    tps_data = worker_dispatcher.get_tps(interval=interval, display_intervals=display_intervals, use_processing=use_processing, verbose=verbose, debug=debug)
 
     # Create a new Workbook
     workbook = openpyxl.Workbook()
@@ -143,6 +147,7 @@ def generate_report(
 
     # Save workbook
     workbook.save(file_path) 
+    if verbose: print("TPS Report has been successfully generated at {}".format(file_path))
 
     return file_path
 
