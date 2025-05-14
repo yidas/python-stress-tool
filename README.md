@@ -44,7 +44,7 @@ Just write your own callback functions based on the [Worker Dispatcher](https://
 ```python
 import stress_test
 
-def each_task(id: int, config, task, log):
+def each_task(id: int, config, task, metadata):
     response = requests.get('https://your.name/reserve-api/')
     return response
 
@@ -52,7 +52,7 @@ def main():
     results = stress_test.start({
         'task': {
             'list': 1000,
-            'callback': each_task,
+            'function': each_task,
         }
     })
     # Generate the TPS report if the stress test completes successfully.
@@ -113,7 +113,7 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
 
 |Option            |Type     |Deafult      |Description|
 |:--               |:--      |:--          |:--        |
-|raw_logs.fields   |dict     |None         |Customized field setting for the `Raw Logs` sheet. <BR>Key is field name, the value can be two types:<BR> - String: Use the provided value as the log key name from Worker Dispatcher to retrieve the value. <BR> - lambda function: Retrieve the return value from the lambda function.|
+|raw_logs.fields   |dict     |None         |Customized field setting for the `Raw Logs` sheet. <BR>Each key represents the field name, and the corresponding value supports two types:<BR> - **String**: Treated as a key to look up in log.metadata (from the Worker Dispatcher) to retrieve the value. <BR> - **Lambda function**: A function that receives log.metadata as input and returns a computed value.|
 
 #### Sample config
 
@@ -122,16 +122,16 @@ import stress_tool
 import requests
 
 # task.callback function
-def task(id: int, config, task, log):
+def task(id: int, config, task, metadata):
     try:
-        response = log['response'] = requests.get('https://your.name/path/')
+        response = metadata['response'] = requests.get('https://your.name/path/')
         try:
-            api_return_code = log['api_return_code'] = response.json().get('returnCode')
+            api_return_code = metadata['api_return_code'] = response.json().get('returnCode')
             return True if api_return_code == "0000" else False
         except Exception as e:
             return False
     except requests.exceptions.ConnectionError:
-        log['error'] = 'ConnectionError'
+        metadata['error'] = 'ConnectionError'
     return False
 
 # Start stress test
@@ -139,7 +139,7 @@ results = stress_tool.start({
     # 'debug': True,
     'task': {
         'list': 60,
-        'callback': task,
+        'function': task,
     },
 })
 
@@ -147,9 +147,9 @@ results = stress_tool.start({
 file_path = stress_test.generate_report(config={
     'raw_logs': {
         'fields': {
-            'Customized Field - HTTP code': lambda log: log.get('response').status_code,
+            'Customized Field - HTTP code': lambda metadata: metadata.get('response').status_code,
             'Customized Field - API Return code': 'api_return_code',
-            'Customized Field - Response Body': lambda log: log.get('response').text,
+            'Customized Field - Response Body': lambda metadata: metadata.get('response').text,
         }
     },
 })

@@ -101,16 +101,16 @@ def generate_report(
     for log in worker_dispatcher.get_logs():
         row_data = [log['task_id'], str(log['started_at']), str(log['ended_at']), log['ended_at'] - log['started_at'], worker_dispatcher.result_is_success(log['result'])]
         # Customized Fields
-        user_log = log.get('log', {})
+        metadata = log.get('metadata', {})
         for key, value in customized_fields.items():
             if callable(value):
                 try:
-                    row_data.append(value(user_log))
+                    row_data.append(value(metadata))
                 except Exception as e:
                     # exit(e)
                     pass
             else:
-                row_data.append(str(user_log.get(value, '')))
+                row_data.append(str(metadata.get(value, '')))
         sheet.append(row_data)
 
     # Sheet for Interval
