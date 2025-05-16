@@ -32,7 +32,9 @@ OUTLINE
 - [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
+    - [start()](#start)
     - [generate_report()](#generate_report)
+    - [print()](#print)
 
 ---
 
@@ -101,6 +103,10 @@ USAGE
 
 By calling the `start()` method with the configuration parameters, the package will invoke [Worker Dispatcher](https://github.com/yidas/python-worker-dispatcher) to dispatch tasks, managing threading or processing based on the provided settings. Once the tasks are completed, `generate_report()` can be called to produce a TPS report based on the result of [Worker Dispatcher](https://github.com/yidas/python-worker-dispatcher).
 
+### start()
+
+Refers to [`worker_dispatcher.start()`](https://github.com/yidas/python-worker-dispatcher?tab=readme-ov-file#usage).
+
 ### generate_report()
 
 An example configuration setting with all options is as follows:
@@ -164,6 +170,8 @@ Indicates whether to generate `Intervals` sheet.
 
 Based on `Intervals` sheet, specifies the number of seconds for each split.
 
+### print()
 
+Refers to [`worker_dispatcher.print()`](https://github.com/yidas/python-worker-dispatcher/tree/main?tab=readme-ov-file#printobjects-sep--endn-filenone-flushtrue).
 
 

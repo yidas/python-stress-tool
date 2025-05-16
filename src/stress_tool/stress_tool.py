@@ -151,6 +151,10 @@ def generate_report(
 
     return file_path
 
+# worker_dispatcher's print function with flush setting
+def print(*args, **kwargs):
+    lib_worker_dispatcher.print(*args, **kwargs)
+
 def _merge_dicts_recursive(default_dict, user_dict):
     merged_dict = copy.deepcopy(default_dict)
     for key, user_value in user_dict.items():
