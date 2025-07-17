@@ -1,5 +1,5 @@
 import worker_dispatcher as lib_worker_dispatcher
-import time, datetime, copy
+import time, datetime, copy, json
 import openpyxl
 
 default_config = {
@@ -81,7 +81,7 @@ def generate_report(
         rows_data.append(["Success Maximum Execution Time", "{:.6f} sec".format(tps_data['peak']['metrics']['success_execution_time']['max'])])
         rows_data.append(["Success Minimum Execution Time", "{:.6f} sec".format(tps_data['peak']['metrics']['success_execution_time']['min'])])
     rows_data.append([])
-    rows_data.append(["Raw Report", str(tps_data)])
+    rows_data.append(["Raw Report", json.dumps(tps_data, ensure_ascii=False)])
     for row in rows_data:
         sheet.append(row)
     # writer.writerows(rows_data)

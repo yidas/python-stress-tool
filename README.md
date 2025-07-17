@@ -6,7 +6,7 @@
     <br>
 </p>
 
-Stress test tool with statistical TPS reports based on Worker Dispatcher in Python
+A lightweight, scriptable performance benchmarking tool for Python with automated TPS reporting.
 
 [![PyPI](https://img.shields.io/pypi/v/stress-tool)](https://pypi.org/project/stress-tool/)
 ![](https://img.shields.io/pypi/implementation/stress-tool)
@@ -16,11 +16,11 @@ Stress test tool with statistical TPS reports based on Worker Dispatcher in Pyth
 Features
 --------
 
-- Based on ***[Worker Dispatcher](https://github.com/yidas/python-worker-dispatcher)** to managed workers*
+- *Easy to Code and Perform*
 
-- ***Statistical TPS Report** in Excel sheets*
+- *Ready-to-Present **TPS Report***
 
-- ***Customized Config** for the report*  
+- ***Dynamic Load Simulation** with frequency_mode*  
 
 
 ---
@@ -64,6 +64,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+```
+
+```bash
+$ python3 main.py > log.txt 2>&1 &
 ```
 
 <img src="https://github.com/yidas/python-stress-tool/blob/main/img/demonstration_excel.png?raw=true" />
@@ -119,7 +123,16 @@ def generate_report(config: dict={}, worker_dispatcher: object=None, file_path: 
 
 |Option            |Type     |Deafult      |Description|
 |:--               |:--      |:--          |:--        |
-|raw_logs.fields   |dict     |None         |Customized field setting for the `Raw Logs` sheet. <BR>Each key represents the field name, and the corresponding value supports two types:<BR> - **String**: Treated as a key to look up in log.metadata (from the Worker Dispatcher) to retrieve the value. <BR> - **Lambda function**: A function that receives log.metadata as input and returns a computed value.|
+|raw_logs.fields   |dict     |None         |Customized field settings for the Excel **Raw Logs** sheet. See [Detailed Configuration](#raw_logsfields-detailed-configuration) below. |
+
+#### raw_logs.fields Detailed Configuration
+
+This setting allows you to map data from your `task()` function into custom columns in the Excel **Raw Logs** sheet.
+
+* **Key (Column Name):** The header name that will appear in the Excel sheet.
+* **Value (Data Mapping):** How to retrieve the data from the `metadata` dictionary you filled during the test. It supports two types:
+    * **String:** The dictionary key name you used in `metadata['your_key']`. The tool will automatically fetch its value.
+    * **Lambda function:** A function that receives the `metadata` dictionary as its argument. Use this when you need to access object properties or perform logic (e.g., `lambda metadata: metadata.get('response').status_code`).
 
 #### Sample config
 
@@ -136,8 +149,12 @@ def task(id: int, config, task, metadata):
             return True if api_return_code == "0000" else False
         except Exception as e:
             return False
-    except requests.exceptions.ConnectionError:
-        metadata['error'] = 'ConnectionError'
+    except requests.exceptions.ConnectTimeout:
+        metadata['error'] = 'ConnectTimeout'
+    except requests.exceptions.ReadTimeout:
+        metadata['error'] = 'ReadTimeout'
+    except requests.exceptions.RequestException as e:
+        metadata['error'] = type(e).__name__
     return False
 
 # Start stress test
@@ -150,7 +167,7 @@ results = stress_tool.start({
 })
 
 # Generate the report
-file_path = stress_test.generate_report(config={
+file_path = stress_tool.generate_report(config={
     'raw_logs': {
         'fields': {
             'Customized Field - HTTP code': lambda metadata: metadata.get('response').status_code,
