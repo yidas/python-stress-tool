@@ -66,6 +66,10 @@ if __name__ == '__main__':
     main()
 ```
 
+```bash
+$ python3 main.py > log.txt 2>&1 &
+```
+
 <img src="https://github.com/yidas/python-stress-tool/blob/main/img/demonstration_excel.png?raw=true" />
 
 ---
