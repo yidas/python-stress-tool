@@ -6,7 +6,7 @@
     <br>
 </p>
 
-Stress test tool with statistical TPS reports based on Worker Dispatcher in Python
+A lightweight, scriptable performance benchmarking tool for Python with automated TPS reporting.
 
 [![PyPI](https://img.shields.io/pypi/v/stress-tool)](https://pypi.org/project/stress-tool/)
 ![](https://img.shields.io/pypi/implementation/stress-tool)
@@ -18,9 +18,11 @@ Features
 
 - Based on ***[Worker Dispatcher](https://github.com/yidas/python-worker-dispatcher)** to managed workers*
 
-- ***Statistical TPS Report** in Excel sheets*
+- *Easy to Code and Perform*
 
-- ***Customized Config** for the report*  
+- *Ready-to-Present **TPS Report***
+
+- ***Dynamic Load Simulation** with frequency_mode*  
 
 
 ---
