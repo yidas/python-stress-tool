@@ -16,8 +16,6 @@ A lightweight, scriptable performance benchmarking tool for Python with automate
 Features
 --------
 
-- Based on ***[Worker Dispatcher](https://github.com/yidas/python-worker-dispatcher)** to managed workers*
-
 - *Easy to Code and Perform*
 
 - *Ready-to-Present **TPS Report***
